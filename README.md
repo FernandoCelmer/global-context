@@ -67,16 +67,19 @@ for hit in backend.search("oauth"):
 
 ## How it works
 
-```
-~/.claude/projects/*/*.jsonl   ->  scanner -> parser -> Conversation
-                                                            |
-                                                            v
-                                            StorageBackend (chroma/sql/json)
-                                                            |
-   UserPromptSubmit hook -> gctx live -> <global-context> --+
-                                                            |
-                                                            v
-                                                      Claude reply
+```mermaid
+flowchart LR
+    A[~/.claude/projects/*.jsonl] --> B[scanner]
+    B --> C[parser]
+    C --> D[Conversation]
+    D --> E{StorageBackend}
+    E --> F[chroma]
+    E --> G[sql]
+    E --> H[json]
+    I[UserPromptSubmit hook] --> J[gctx live]
+    J --> E
+    J --> K[global-context block]
+    K --> L[Claude reply]
 ```
 
 ## CLI reference
