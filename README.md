@@ -62,15 +62,19 @@ Tools: `add_entry`, `search_entries`, `warmup`, `stats`, `list_scopes`, `delete_
 
 ## Claude Code hooks
 
-See [global_context/hooks/example_settings.json](global_context/hooks/example_settings.json).
+Cross-session memory: every session writes the transcript to the store, every new session reads relevant entries back as additional context. Drop the snippet from [global_context/hooks/example_settings.json](global_context/hooks/example_settings.json) into `~/.claude/settings.json`.
 
-```bash
-python -m global_context.hooks.autosave  # reads stdin JSON or env vars
-```
+| Event | Command | Effect |
+|-------|---------|--------|
+| `SessionStart` | `python -m global_context.hooks.recall SessionStart` | injects warmup top-k as context |
+| `UserPromptSubmit` | `python -m global_context.hooks.recall UserPromptSubmit` | injects entries semantically matching the prompt |
+| `Stop` | `python -m global_context.hooks.autosave` | saves the transcript |
+| `PreCompact` | `python -m global_context.hooks.autosave` | saves before compaction |
 
 Env vars:
 - `GLOBAL_CONTEXT_HOME` — storage root (default `~/.global-context`)
-- `GLOBAL_CONTEXT_SCOPE` — default scope for autosave
+- `GLOBAL_CONTEXT_SCOPE` — default scope for save / filter for recall
+- `GLOBAL_CONTEXT_RECALL_K` — top-k entries injected (default 8 on session, 5 on prompt)
 - `CLAUDE_TRANSCRIPT_PATH` — transcript path fallback
 
 ## Backends
