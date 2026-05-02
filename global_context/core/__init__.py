@@ -1,4 +1,10 @@
-from global_context.core.models import Entry, Scope, Topic
-from global_context.core.store import ContextStore
+"""Core domain models and types."""
 
-__all__ = ["Entry", "Scope", "Topic", "ContextStore"]
+from global_context.core.models import (
+    Conversation,
+    MemoryEntry,
+    Message,
+    ProjectContext,
+)
+
+__all__ = ["Conversation", "MemoryEntry", "Message", "ProjectContext"]

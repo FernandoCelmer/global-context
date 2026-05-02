@@ -1,8 +1,11 @@
+"""Pydantic domain models for stored context."""
+
 from __future__ import annotations
 
-import hashlib
+import uuid
 from datetime import datetime, timezone
-from typing import Optional
+from enum import Enum
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -11,36 +14,69 @@ def _utcnow() -> datetime:
     return datetime.now(timezone.utc)
 
 
-def _hash_id(*parts: str) -> str:
-    h = hashlib.sha1("::".join(parts).encode("utf-8")).hexdigest()
-    return h[:16]
+def _new_id() -> str:
+    return uuid.uuid4().hex
 
 
-class Entry(BaseModel):
-    id: str = ""
-    scope: str
-    topic: str
+class Role(str, Enum):
+    USER = "user"
+    ASSISTANT = "assistant"
+    SYSTEM = "system"
+    TOOL = "tool"
+
+
+class EntryKind(str, Enum):
+    CONVERSATION = "conversation"
+    PROJECT = "project"
+    NOTE = "note"
+    MEMORY = "memory"
+
+
+class Message(BaseModel):
+    role: Role
     content: str
-    source: Optional[str] = None
+    timestamp: datetime = Field(default_factory=_utcnow)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class Conversation(BaseModel):
+    id: str = Field(default_factory=_new_id)
+    project: str | None = None
+    title: str | None = None
+    messages: list[Message] = Field(default_factory=list)
     created_at: datetime = Field(default_factory=_utcnow)
-    metadata: dict = Field(default_factory=dict)
+    updated_at: datetime = Field(default_factory=_utcnow)
+    metadata: dict[str, Any] = Field(default_factory=dict)
 
-    def model_post_init(self, _ctx) -> None:
-        if not self.id:
-            object.__setattr__(
-                self,
-                "id",
-                _hash_id(self.scope, self.topic, self.content, self.created_at.isoformat()),
-            )
+    def append(self, message: Message) -> None:
+        self.messages.append(message)
+        self.updated_at = _utcnow()
+
+    def as_text(self) -> str:
+        return "\n".join(f"[{m.role.value}] {m.content}" for m in self.messages)
 
 
-class Topic(BaseModel):
+class ProjectContext(BaseModel):
     name: str
-    scope: str
-    description: Optional[str] = None
+    path: str
+    summary: str = ""
+    tags: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+    updated_at: datetime = Field(default_factory=_utcnow)
 
 
-class Scope(BaseModel):
-    name: str
-    description: Optional[str] = None
+class MemoryEntry(BaseModel):
+    id: str = Field(default_factory=_new_id)
+    kind: EntryKind = EntryKind.NOTE
+    project: str | None = None
+    title: str = ""
+    content: str = ""
+    tags: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
     created_at: datetime = Field(default_factory=_utcnow)
+    updated_at: datetime = Field(default_factory=_utcnow)
+
+
+class SearchResult(BaseModel):
+    entry: MemoryEntry
+    score: float = 0.0
