@@ -16,12 +16,12 @@ Claude Code forgets between sessions. `global-context` ingests every `~/.claude/
 
 ## Features
 
-- 🧠 **Auto-ingest** all past Claude Code sessions (transcripts, tool calls, results)
-- 🔎 **Semantic search** with ChromaDB embeddings (or fast SQL token match)
-- 🪝 **Hooks** — `SessionStart` and `UserPromptSubmit` inject context automatically
-- 🛠 **Skill bundled** — installs to `~/.claude/skills/global-context/SKILL.md`
-- 💾 **Pluggable backends** — JSON / SQLAlchemy 2.x / Chroma, all behind one ABC
-- ⚡ **Zero config** — `pip install` then go; `.pth` bootstraps storage on first import
+- Auto-ingest all past Claude Code sessions (transcripts, tool calls, results)
+- Semantic search with ChromaDB embeddings (or fast SQL token match)
+- Hooks: `SessionStart` and `UserPromptSubmit` inject context automatically
+- Skill bundled, installs to `~/.claude/skills/global-context/SKILL.md`
+- Pluggable backends: JSON, SQLAlchemy 2.x, Chroma — single ABC
+- Zero config: `pip install` then go; `.pth` bootstraps storage on first import
 
 ## Install
 
@@ -48,7 +48,7 @@ Pick via `GCTX_BACKEND=sql|json|chroma` or `--backend`.
 
 | Backend | Search          | Deps        | Default |
 |---------|-----------------|-------------|---------|
-| chroma  | semantic vector | chromadb    | ✅      |
+| chroma  | semantic vector | chromadb    | yes     |
 | sql     | tokenized LIKE  | SQLAlchemy  |         |
 | json    | substring       | none        |         |
 
@@ -68,15 +68,15 @@ for hit in backend.search("oauth"):
 ## How it works
 
 ```
-~/.claude/projects/*/*.jsonl   ──▶  scanner ──▶ parser ──▶ Conversation
-                                                              │
-                                                              ▼
-                                              StorageBackend (chroma/sql/json)
-                                                              │
-   UserPromptSubmit hook ──▶ gctx live ──▶ <global-context> ──┘
-                                                              │
-                                                              ▼
-                                                        Claude reply
+~/.claude/projects/*/*.jsonl   ->  scanner -> parser -> Conversation
+                                                            |
+                                                            v
+                                            StorageBackend (chroma/sql/json)
+                                                            |
+   UserPromptSubmit hook -> gctx live -> <global-context> --+
+                                                            |
+                                                            v
+                                                      Claude reply
 ```
 
 ## CLI reference
@@ -104,4 +104,4 @@ gctx hook uninstall           remove hook entries
 
 ## License
 
-MIT © Fernando Celmer
+MIT, Fernando Celmer
