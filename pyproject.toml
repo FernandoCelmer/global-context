@@ -1,58 +1,54 @@
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
-
 [project]
 name = "global-context"
-version = "0.1.0"
-description = "Local-first AI memory with verbatim storage, hierarchical index, and pluggable backends."
+version = "0.2.0"
+description = "Persistent conversation and project context store for Claude Code."
+authors = [
+    {name = "Fernando Celmer", email = "email@fernandocelmer.com"},
+]
 readme = "README.md"
-requires-python = ">=3.10"
-license = { text = "MIT" }
-authors = [{ name = "Fernando Celmer", email = "fernandocelmer@gmail.com" }]
-keywords = ["ai", "memory", "rag", "vector-search", "llm", "context"]
-classifiers = [
-    "Development Status :: 3 - Alpha",
-    "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-]
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+keywords = ["claude", "context", "memory", "rag", "llm"]
 dependencies = [
-    "chromadb>=0.5.0",
-    "sentence-transformers>=2.7.0",
     "typer>=0.12.0",
-    "pydantic>=2.6.0",
     "rich>=13.7.0",
-]
-
-[project.optional-dependencies]
-mcp = ["mcp>=1.0.0"]
-dev = [
-    "pytest>=8.0.0",
-    "pytest-cov>=5.0.0",
-    "ruff>=0.4.0",
-    "mypy>=1.10.0",
+    "pydantic>=2.6.0",
+    "sqlalchemy>=2.0.30",
+    "chromadb>=0.5.0",
+    "platformdirs>=4.2.0",
 ]
 
 [project.scripts]
-global-context = "global_context.cli.app:app"
 gctx = "global_context.cli.app:app"
+global-context = "global_context.cli.app:app"
 
-[project.urls]
-Homepage = "https://github.com/FernandoCelmer/global-context"
-Issues = "https://github.com/FernandoCelmer/global-context/issues"
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-cov>=5.0.0",
+    "ruff>=0.5.0",
+]
 
-[tool.hatch.build.targets.wheel]
-packages = ["global_context"]
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["global_context*"]
+
+[tool.setuptools.package-data]
+"global_context.skill" = ["SKILL.md"]
+
+[tool.setuptools.data-files]
+"" = ["_global_context.pth"]
 
 [tool.ruff]
 line-length = 100
-target-version = "py310"
-
-[tool.ruff.lint]
-select = ["E", "F", "I", "B", "UP", "N", "W"]
-ignore = ["E501"]
+target-version = "py311"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
