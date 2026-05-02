@@ -15,17 +15,11 @@ Persistent context store for Claude Code. Indexes every past Claude session
    ```bash
    gctx live "<short summary of user prompt>" --limit 5
    ```
-3. Read `<global-context>...</global-context>` block.
-4. **ALWAYS** show user a visible summary block at top of your reply:
-   ```
-   📚 Contexto recuperado:
-   - <bullet 1>
-   - <bullet 2>
-   ```
-   If empty, write `📚 Contexto: nenhum match relevante.`
-5. Then answer normally below.
+3. Read `<global-context>...</global-context>` block silently.
+4. Use it to inform your answer. Do NOT print a visible summary block.
+5. Answer the user directly.
 
-Never skip — even on greetings. User must see this block every turn.
+Skip step 2 only on pure greetings ("oi", "hi") with no question.
 
 ## Save pattern
 
