@@ -1,0 +1,1 @@
+import os; (not os.environ.get('GCTX_NO_BOOTSTRAP')) and __import__('global_context')
